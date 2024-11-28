@@ -6,7 +6,8 @@ import fracesco.santaniello.model.Cell;
 import fracesco.santaniello.model.Direction;
 import fracesco.santaniello.model.Food;
 import fracesco.santaniello.model.Snake;
-import fracesco.santaniello.util.SoundPlayer;
+import fracesco.santaniello.util.ImageService;
+import fracesco.santaniello.util.SoundService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.time.LocalTime;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -24,6 +26,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private Direction direction;
     private int maxPoints;
     private boolean pause;
+    private LocalTime startTime;
 
     private static class InnerClass{
         private static final GamePanel instance = new GamePanel();
@@ -74,7 +77,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private void drawSnake() {
         graphics.setColor(Snake.COLOR);
         Snake.getInstance().getCells().forEach(cell -> {
-            graphics.fillOval(cell.getX(), cell.getY(), Cell.SIZE, Cell.SIZE);
+            graphics.fillRoundRect(cell.getX(), cell.getY(), Cell.SIZE, Cell.SIZE, Cell.SIZE / 2, Cell.SIZE / 2);
         });
     }
 
@@ -85,8 +88,13 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void drawFood() {
-        graphics.setColor(food.getFoodType().getColor());
-        graphics.fillOval(food.getCell().getX(), food.getCell().getY(), Cell.SIZE, Cell.SIZE);
+        if (ImageService.getInstance().getAppleImage() != null){
+            graphics.drawImage(ImageService.getInstance().getAppleImage(), food.getCell().getX(), food.getCell().getY(), Cell.SIZE, Cell.SIZE,getBackground(), this);
+        }
+        else{
+            graphics.setColor(Color.RED);
+            graphics.fillOval(food.getCell().getX(), food.getCell().getY(), Cell.SIZE, Cell.SIZE);
+        }
     }
 
     private void updateGame(){
@@ -98,7 +106,7 @@ public class GamePanel extends JPanel implements ActionListener {
             }
             if (eat){
                 food = Food.genFood();
-                SoundPlayer.getInstance().playSoundEat();
+                SoundService.getInstance().playSoundEat();
             }
         }
         else {
@@ -114,10 +122,16 @@ public class GamePanel extends JPanel implements ActionListener {
         return maxPoints;
     }
 
+    public LocalTime getStartTime(){
+        return startTime;
+    }
+
     public void lose(){
         if (Snake.getInstance().getCells().size() - 1 > maxPoints)
             maxPoints = Snake.getInstance().getCells().size() - 1;
-        SoundPlayer.getInstance().playSoundGameOver();
+
+        SoundService.getInstance().playSoundGameOver();
+        SoundService.getInstance().setPlayBackGround(false);
         timer.stop();
         LoseDialog.getInstance().setVisible(true);
     }
@@ -131,28 +145,28 @@ public class GamePanel extends JPanel implements ActionListener {
                 case KeyEvent.VK_UP:
                     if (direction != Direction.DOWN && direction != Direction.UP){
                         direction = Direction.UP;
-                        SoundPlayer.getInstance().playSoundMove();
+                        SoundService.getInstance().playSoundMove();
                     }
                     break;
                 case KeyEvent.VK_S:
                 case KeyEvent.VK_DOWN:
                     if (direction != Direction.UP && direction != Direction.DOWN){
                         direction = Direction.DOWN;
-                        SoundPlayer.getInstance().playSoundMove();
+                        SoundService.getInstance().playSoundMove();
                     }
                     break;
                 case KeyEvent.VK_A:
                 case KeyEvent.VK_LEFT:
                     if (direction != Direction.RIGHT && direction != Direction.LEFT){
                         direction = Direction.LEFT;
-                        SoundPlayer.getInstance().playSoundMove();
+                        SoundService.getInstance().playSoundMove();
                     }
                     break;
                 case KeyEvent.VK_D:
                 case KeyEvent.VK_RIGHT:
                     if (direction != Direction.LEFT && direction != Direction.RIGHT){
                         direction = Direction.RIGHT;
-                        SoundPlayer.getInstance().playSoundMove();
+                        SoundService.getInstance().playSoundMove();
                     }
                     break;
             }
@@ -165,5 +179,7 @@ public class GamePanel extends JPanel implements ActionListener {
         food = Food.genFood();
         direction = Direction.NONE;
         timer.start();
+        startTime = LocalTime.now();
+        SoundService.getInstance().setPlayBackGround(true);
     }
 }

@@ -7,11 +7,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Duration;
+import java.time.LocalTime;
 
 public class LoseDialog extends JDialog {
 
     private final JLabel puntiLabel = new JLabel("");
     private final JLabel recordLabel = new JLabel("");
+    private final JLabel timeLabel = new JLabel("");
 
     private static class InnerClass{
         private static final LoseDialog instance = new LoseDialog();
@@ -20,7 +23,7 @@ public class LoseDialog extends JDialog {
     private LoseDialog(){
         setModal(true);
         setTitle("Hai perso!");
-        setSize(400,200);
+        setSize(350,250);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(MainWindow.getInstance());
@@ -34,6 +37,8 @@ public class LoseDialog extends JDialog {
     @Override
     public void setVisible(boolean b) {
         if (b){
+            Duration duration = Duration.between(GamePanel.getInstance().getStartTime(), LocalTime.now());
+            timeLabel.setText("Tempo di gioco %d %d %d".formatted(duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60));
             puntiLabel.setText("Punteggio " + (Snake.getInstance().getCells().size() - 1));
             recordLabel.setText("Record " + GamePanel.getInstance().getMaxPoints());
         }
@@ -49,6 +54,7 @@ public class LoseDialog extends JDialog {
 
         puntiLabel.setFont(GamePanel.getInstance().getPointsFont());
         recordLabel.setFont(GamePanel.getInstance().getPointsFont());
+        timeLabel.setFont(GamePanel.getInstance().getPointsFont());
 
         exit.addActionListener(new ActionListener() {
             @Override
@@ -72,6 +78,9 @@ public class LoseDialog extends JDialog {
         labelPanel.add(puntiLabel, constraints);
 
         constraints.gridy = 1;
+        labelPanel.add(timeLabel, constraints);
+
+        constraints.gridy = 2;
         labelPanel.add(recordLabel, constraints);
 
         buttonPanel.add(exit, BorderLayout.WEST);
@@ -79,7 +88,7 @@ public class LoseDialog extends JDialog {
 
         panel.add(labelPanel, constraints);
 
-        constraints.gridy = 2;
+        constraints.gridy = 3;
         panel.add(buttonPanel, constraints);
         add(panel);
     }
