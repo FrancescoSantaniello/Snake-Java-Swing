@@ -1,6 +1,5 @@
 package fracesco.santaniello.gui;
 
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import fracesco.santaniello.gui.component.GamePanel;
 import fracesco.santaniello.model.Cell;
@@ -32,7 +31,7 @@ public class MainWindow extends JFrame {
         super("Snake");
         if (W % Cell.SIZE != 0 || H % Cell.SIZE != 0)
             throw new IllegalArgumentException("Dimenensioni non valide");
-        setSize(W + Cell.SIZE * 2, H + Cell.SIZE * 3);
+        setSize(W + Cell.SIZE * 2, H + Cell.SIZE * 4);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());

@@ -19,14 +19,15 @@ import java.time.LocalTime;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    private Font pointsFont;
-    private final Timer timer = new Timer(Math.round(1000f / Snake.SPEED), this);
+    private Font font;
+    private final Timer timer = new Timer(Snake.START_SPEED, this);
     private Graphics graphics;
     private Food food;
     private Direction direction;
-    private int maxPoints;
+    private short maxPoints;
     private boolean pause;
     private LocalTime startTime;
+    private boolean wall = false;
 
     private static class InnerClass{
         private static final GamePanel instance = new GamePanel();
@@ -37,14 +38,12 @@ public class GamePanel extends JPanel implements ActionListener {
         setSize(MainWindow.W, MainWindow.H);
         setPreferredSize(getSize());
         setBorder(BorderFactory.createLineBorder(Color.BLUE, Cell.SIZE / 5));
-
         try{
-            pointsFont = Font.createFont(Font.TRUETYPE_FONT, new File("./source/font/font.ttf")).deriveFont(20f);
+            font = Font.createFont(Font.TRUETYPE_FONT, new File("./source/font/font.ttf")).deriveFont(20f);
         }
         catch (Exception ex){
-            pointsFont = new Font("Arial", Font.BOLD, 18);
+            font = new Font("Arial", Font.BOLD, 18);
         }
-
         start();
     }
 
@@ -52,8 +51,16 @@ public class GamePanel extends JPanel implements ActionListener {
         return InnerClass.instance;
     }
 
-    public Font getPointsFont(){
-        return pointsFont;
+    public void setModWall(boolean value){
+        wall = value;
+    }
+
+    public boolean isModWall(){
+        return wall;
+    }
+
+    public Font getFont(){
+        return font;
     }
 
     @Override
@@ -70,7 +77,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void drawPoints(){
         graphics.setColor(Color.BLACK);
-        graphics.setFont(pointsFont);
+        graphics.setFont(font);
         graphics.drawString(Snake.getInstance().getCells().size() - 1 + "", (MainWindow.W / Cell.SIZE) / 2, Cell.SIZE);
     }
 
@@ -83,7 +90,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void drawPause(){
         graphics.setColor(Color.BLACK);
-        graphics.setFont(pointsFont);
+        graphics.setFont(font);
         graphics.drawString("Gioco in pausa", MainWindow.W / 2 - (Cell.SIZE * 3), MainWindow.H / 2);
     }
 
@@ -118,7 +125,7 @@ public class GamePanel extends JPanel implements ActionListener {
         drawPoints();
     }
 
-    public int getMaxPoints(){
+    public short getMaxPoints(){
         return maxPoints;
     }
 
@@ -128,7 +135,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void lose(){
         if (Snake.getInstance().getCells().size() - 1 > maxPoints)
-            maxPoints = Snake.getInstance().getCells().size() - 1;
+            maxPoints = (short) (Snake.getInstance().getCells().size() - 1);
 
         SoundService.getInstance().playSoundGameOver();
         SoundService.getInstance().setPlayBackGround(false);
@@ -168,6 +175,18 @@ public class GamePanel extends JPanel implements ActionListener {
                         direction = Direction.RIGHT;
                         SoundService.getInstance().playSoundMove();
                     }
+                    break;
+                case KeyEvent.VK_PLUS:
+                    if (timer.getDelay() >= 10)
+                        timer.setDelay(timer.getDelay() - 10);
+                    break;
+                case KeyEvent.VK_MINUS:
+                    if (timer.getDelay() + 10 <= Integer.MAX_VALUE){
+                        timer.setDelay(timer.getDelay() + 10);
+                    }
+                    break;
+                case KeyEvent.VK_NUMPAD0:
+                    timer.setDelay(timer.getInitialDelay());
                     break;
             }
         }

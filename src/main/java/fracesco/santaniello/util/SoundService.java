@@ -2,6 +2,7 @@ package fracesco.santaniello.util;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import java.io.File;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -12,6 +13,7 @@ public class SoundService {
     private Clip clipEat;
     private Clip clipMove;
     private Clip clipBackGround;
+    private Clip clipTeleport;
 
     private final BlockingQueue<Runnable> soundQueue = new LinkedBlockingQueue<>();
 
@@ -30,6 +32,9 @@ public class SoundService {
             clipMove = AudioSystem.getClip();
             clipMove.open(AudioSystem.getAudioInputStream(new File("./source/sounds/move.wav")));
 
+            clipTeleport = AudioSystem.getClip();
+            clipTeleport.open(AudioSystem.getAudioInputStream(new File("./source/sounds/teleport.wav")));
+
             clipBackGround = AudioSystem.getClip();
             if (new Random().nextInt(2) == 1){
                 clipBackGround.open(AudioSystem.getAudioInputStream(new File("./source/sounds/background_sound_1.wav")));
@@ -38,6 +43,16 @@ public class SoundService {
                 clipBackGround.open(AudioSystem.getAudioInputStream(new File("./source/sounds/background_sound_2.wav")));
             }
             clipBackGround.loop(Clip.LOOP_CONTINUOUSLY);
+
+            if (clipBackGround.getControl(FloatControl.Type.MASTER_GAIN) instanceof FloatControl control){
+                control.setValue(-10f);
+            }
+            if (clipTeleport.getControl(FloatControl.Type.MASTER_GAIN) instanceof FloatControl control){
+                control.setValue(-10f);
+            }
+            if (clipMove.getControl(FloatControl.Type.MASTER_GAIN) instanceof FloatControl control){
+                control.setValue(control.getMaximum());
+            }
 
             Thread soundThread = new Thread(() -> {
                 try {
@@ -79,6 +94,10 @@ public class SoundService {
 
     public void playSoundGameOver() {
         playSound(clipGameOver);
+    }
+
+    public void playSoundTeleport() {
+        playSound(clipTeleport);
     }
 
     public void setPlayBackGround(boolean play){

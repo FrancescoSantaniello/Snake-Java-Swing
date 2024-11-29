@@ -38,7 +38,7 @@ public class LoseDialog extends JDialog {
     public void setVisible(boolean b) {
         if (b){
             Duration duration = Duration.between(GamePanel.getInstance().getStartTime(), LocalTime.now());
-            timeLabel.setText("Tempo di gioco %d %d %d".formatted(duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60));
+            timeLabel.setText("Tempo di gioco %5d %5d %5d".formatted(duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60));
             puntiLabel.setText("Punteggio " + (Snake.getInstance().getCells().size() - 1));
             recordLabel.setText("Record " + GamePanel.getInstance().getMaxPoints());
         }
@@ -46,24 +46,24 @@ public class LoseDialog extends JDialog {
     }
 
     private void initComponent(){
-        JButton exit = new JButton("Esci"),
-                newGame = new JButton("Nuova partita");
+        JButton exitButton = new JButton("Esci"),
+                newGameButton = new JButton("Nuova partita");
         JPanel panel = new JPanel(new GridBagLayout()),
                 labelPanel = new JPanel(new GridBagLayout()),
                 buttonPanel = new JPanel();
 
-        puntiLabel.setFont(GamePanel.getInstance().getPointsFont());
-        recordLabel.setFont(GamePanel.getInstance().getPointsFont());
-        timeLabel.setFont(GamePanel.getInstance().getPointsFont());
+        puntiLabel.setFont(GamePanel.getInstance().getFont());
+        recordLabel.setFont(GamePanel.getInstance().getFont());
+        timeLabel.setFont(GamePanel.getInstance().getFont());
 
-        exit.addActionListener(new ActionListener() {
+        exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
 
-        newGame.addActionListener(new ActionListener() {
+        newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Snake.getInstance().getCells().clear();
@@ -83,8 +83,8 @@ public class LoseDialog extends JDialog {
         constraints.gridy = 2;
         labelPanel.add(recordLabel, constraints);
 
-        buttonPanel.add(exit, BorderLayout.WEST);
-        buttonPanel.add(newGame, BorderLayout.EAST);
+        buttonPanel.add(exitButton, BorderLayout.WEST);
+        buttonPanel.add(newGameButton, BorderLayout.EAST);
 
         panel.add(labelPanel, constraints);
 
