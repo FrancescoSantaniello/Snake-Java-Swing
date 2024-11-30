@@ -26,7 +26,7 @@ public class LoseDialog extends JDialog {
         setSize(350,250);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
-        setLocationRelativeTo(MainWindow.getInstance());
+        setLocationRelativeTo(GameWindow.getInstance());
         initComponent();
     }
 
@@ -47,14 +47,15 @@ public class LoseDialog extends JDialog {
 
     private void initComponent(){
         JButton exitButton = new JButton("Esci"),
-                newGameButton = new JButton("Nuova partita");
+                newGameButton = new JButton("Nuova partita"),
+                menuButton = new JButton("Torna al menu");
         JPanel panel = new JPanel(new GridBagLayout()),
                 labelPanel = new JPanel(new GridBagLayout()),
                 buttonPanel = new JPanel();
 
-        puntiLabel.setFont(GamePanel.getInstance().getFont());
-        recordLabel.setFont(GamePanel.getInstance().getFont());
-        timeLabel.setFont(GamePanel.getInstance().getFont());
+        puntiLabel.setFont(GamePanel.getGameFont());
+        recordLabel.setFont(GamePanel.getGameFont());
+        timeLabel.setFont(GamePanel.getGameFont());
 
         exitButton.addActionListener(new ActionListener() {
             @Override
@@ -63,10 +64,18 @@ public class LoseDialog extends JDialog {
             }
         });
 
+        menuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainWindow.getInstance().setVisible(true);
+                dispose();
+            }
+        });
+
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Snake.getInstance().getCells().clear();
+                GameWindow.getInstance().setVisible(true);
                 GamePanel.getInstance().start();
                 dispose();
             }
@@ -83,7 +92,8 @@ public class LoseDialog extends JDialog {
         constraints.gridy = 2;
         labelPanel.add(recordLabel, constraints);
 
-        buttonPanel.add(exitButton, BorderLayout.WEST);
+        buttonPanel.add(menuButton, BorderLayout.WEST);
+        buttonPanel.add(exitButton, BorderLayout.CENTER);
         buttonPanel.add(newGameButton, BorderLayout.EAST);
 
         panel.add(labelPanel, constraints);

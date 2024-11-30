@@ -1,6 +1,6 @@
 package fracesco.santaniello.model;
 
-import fracesco.santaniello.gui.MainWindow;
+import fracesco.santaniello.gui.GameWindow;
 
 import java.util.Objects;
 import java.util.Random;
@@ -21,8 +21,8 @@ public class Food {
         Food food = new Food();
         food.setCell(new Cell());
         do{
-            food.getCell().setY((short) (rand.nextInt(2, MainWindow.H / Cell.SIZE - 1) * Cell.SIZE));
-            food.getCell().setX((short) (rand.nextInt(2, MainWindow.W / Cell.SIZE - 1) * Cell.SIZE));
+            food.getCell().setY((short) (rand.nextInt(2, GameWindow.H / Cell.SIZE - 1) * Cell.SIZE));
+            food.getCell().setX((short) (rand.nextInt(2, GameWindow.W / Cell.SIZE - 1) * Cell.SIZE));
         }
         while(Snake.getInstance().getCells().contains(food.getCell()));
         return food;

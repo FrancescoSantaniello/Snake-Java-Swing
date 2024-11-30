@@ -1,6 +1,7 @@
 package fracesco.santaniello.gui.component;
 
 import fracesco.santaniello.gui.LoseDialog;
+import fracesco.santaniello.gui.GameWindow;
 import fracesco.santaniello.gui.MainWindow;
 import fracesco.santaniello.model.Cell;
 import fracesco.santaniello.model.Direction;
@@ -19,7 +20,7 @@ import java.time.LocalTime;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    private Font font;
+    private static Font font;
     private final Timer timer = new Timer(Snake.START_SPEED, this);
     private Graphics graphics;
     private Food food;
@@ -27,7 +28,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private short maxPoints;
     private boolean pause;
     private LocalTime startTime;
-    private boolean wall = false;
+    private boolean wall = MainWindow.getInstance().isWallCheck();
 
     private static class InnerClass{
         private static final GamePanel instance = new GamePanel();
@@ -35,32 +36,37 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private GamePanel() {
         setBackground(new Color(0xAAD751));
-        setSize(MainWindow.W, MainWindow.H);
+        setSize(GameWindow.W, GameWindow.H);
         setPreferredSize(getSize());
         setBorder(BorderFactory.createLineBorder(Color.BLUE, Cell.SIZE / 5));
-        try{
-            font = Font.createFont(Font.TRUETYPE_FONT, new File("./source/font/font.ttf")).deriveFont(20f);
+        if (font == null){
+            try{
+                font = Font.createFont(Font.TRUETYPE_FONT, new File("./source/font/font.ttf")).deriveFont(20f);
+            }
+            catch (Exception ex){
+                font = new Font("Arial", Font.BOLD, 18);
+            }
         }
-        catch (Exception ex){
-            font = new Font("Arial", Font.BOLD, 18);
-        }
-        start();
     }
 
     public static GamePanel getInstance(){
         return InnerClass.instance;
     }
 
-    public void setModWall(boolean value){
-        wall = value;
+    public static Font getGameFont(){
+        if (font == null){
+            try{
+                font = Font.createFont(Font.TRUETYPE_FONT, new File("./source/font/font.ttf")).deriveFont(20f);
+            }
+            catch (Exception ex){
+                font = new Font("Arial", Font.BOLD, 18);
+            }
+        }
+        return font;
     }
 
     public boolean isModWall(){
         return wall;
-    }
-
-    public Font getFont(){
-        return font;
     }
 
     @Override
@@ -78,7 +84,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private void drawPoints(){
         graphics.setColor(Color.BLACK);
         graphics.setFont(font);
-        graphics.drawString(Snake.getInstance().getCells().size() - 1 + "", (MainWindow.W / Cell.SIZE) / 2, Cell.SIZE);
+        graphics.drawString(Snake.getInstance().getCells().size() - 1 + "", (GameWindow.W / Cell.SIZE) / 2, Cell.SIZE);
     }
 
     private void drawSnake() {
@@ -91,7 +97,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private void drawPause(){
         graphics.setColor(Color.BLACK);
         graphics.setFont(font);
-        graphics.drawString("Gioco in pausa", MainWindow.W / 2 - (Cell.SIZE * 3), MainWindow.H / 2);
+        graphics.drawString("Gioco in pausa", GameWindow.W / 2 - (Cell.SIZE * 3), GameWindow.H / 2);
     }
 
     public void drawFood() {
@@ -137,9 +143,10 @@ public class GamePanel extends JPanel implements ActionListener {
         if (Snake.getInstance().getCells().size() - 1 > maxPoints)
             maxPoints = (short) (Snake.getInstance().getCells().size() - 1);
 
+        timer.stop();
         SoundService.getInstance().playSoundGameOver();
         SoundService.getInstance().setPlayBackGround(false);
-        timer.stop();
+        GameWindow.getInstance().setVisible(false);
         LoseDialog.getInstance().setVisible(true);
     }
 
@@ -192,9 +199,11 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-
     public void start(){
-        Snake.getInstance().getCells().add(new Cell((short) (MainWindow.W / 2), (short) (MainWindow.H / 2)));
+        if (!Snake.getInstance().getCells().isEmpty())
+            Snake.getInstance().getCells().clear();
+
+        Snake.getInstance().getCells().add(new Cell((short) (GameWindow.W / 2), (short) (GameWindow.H / 2)));
         food = Food.genFood();
         direction = Direction.NONE;
         timer.start();
