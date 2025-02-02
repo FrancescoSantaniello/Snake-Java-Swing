@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private void drawPoints(){
         graphics.setColor(Color.BLACK);
         graphics.setFont(font);
-        graphics.drawString(Snake.getInstance().getCells().size() - 1 + "", (GameWindow.W / Cell.SIZE) / 2, Cell.SIZE);
+        graphics.drawString(String.valueOf(Snake.getInstance().getCells().size() - 1), (GameWindow.W / Cell.SIZE) / 2, Cell.SIZE);
     }
 
     private void drawSnake() {
